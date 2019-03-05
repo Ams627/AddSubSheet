@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AddSubSheet
 {
@@ -11,6 +12,7 @@ namespace AddSubSheet
     }
     internal class AddSubSum
     {
+        int _sumsPerPage;
         static Counters counters = new Counters();
 
         readonly Random rnd = new Random();
@@ -22,8 +24,46 @@ namespace AddSubSheet
         {
             Add, Sub
         }
-        public AddSubSum()
+        public AddSubSum(int sumsPerPage)
         {
+            this._sumsPerPage = sumsPerPage;
+        }
+
+        private IEnumerable<AddSubSum> Generator()
+        {
+            var sumlist = new List<AddSubSum>();
+            while (true)
+            {
+                var l1 = _sumsPerPage / 2;
+                var l2 = _sumsPerPage * 3 / 4;
+                for (int i = 0; i < l1; i++)
+                {
+                    var sum = GenerateAddSum();
+                }
+                for (int i = l1; i < l2; i++)
+                {
+                    var sum = GenerateSubSumNoBorrow();
+                }
+                for (int i = l2; i < _sumsPerPage; i++)
+                {
+                    var sum = GenerateSubSum();
+                }
+            }
+        }
+
+        private object GenerateSubSumNoBorrow()
+        {
+            throw new NotImplementedException();
+        }
+
+        private object GenerateAddSum()
+        {
+            throw new NotImplementedException();
+        }
+
+        private object GenerateSubSum()
+        {
+            throw new NotImplementedException();
         }
 
         public AddSubSum Next()

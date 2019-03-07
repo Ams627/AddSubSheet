@@ -44,8 +44,10 @@ namespace AddSubSheet
                     }
                 }
 
+                const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 const int columns = 4;
                 const int rows = 18;
+                var answers = new List<int>();
                 for (int sheet = 0; sheet < numberOfWorksheets; sheet++)
                 {
                     var filename = MakeFilename(sheet);
@@ -64,11 +66,30 @@ namespace AddSubSheet
                         stream.WriteLine("margin:0;");
                         stream.WriteLine("border-collapse:collapse;");
                         stream.WriteLine("}");
-                        stream.WriteLine(".sumstable,.sumstable td {");
+                        stream.WriteLine(".sumstable,.sumstable td + td {");
                         stream.WriteLine("padding-left:20px;");
                         stream.WriteLine("padding-top:20px;");
                         stream.WriteLine("padding-right:100px;");
                         stream.WriteLine("padding-bottom:20px;");
+                        stream.WriteLine("color:black;");
+                        stream.WriteLine("white-space: nowrap;");
+                        stream.WriteLine("border:solid 1px #dddddd;");
+                        stream.WriteLine("}");
+                        stream.WriteLine(".sumstable,.sumstable td {");
+                        stream.WriteLine("padding:0px;");
+                        stream.WriteLine("padding-right:20px;");
+                        stream.WriteLine("color:#dddddd;");
+                        stream.WriteLine("white-space: nowrap;");
+                        stream.WriteLine("border:solid 1px #dddddd;");
+                        stream.WriteLine("}");
+                        stream.WriteLine(".answerstable {");
+                        stream.WriteLine("border-collapse:collapse;");
+                        stream.WriteLine("text-align:center;");
+                        stream.WriteLine("}");
+                        stream.WriteLine(".answerstable, .answerstable td + td {");
+                        stream.WriteLine("padding-left:20px;");
+                        stream.WriteLine("padding-right:20px;");
+                        stream.WriteLine("color:black;");
                         stream.WriteLine("white-space: nowrap;");
                         stream.WriteLine("border:solid 1px #dddddd;");
                         stream.WriteLine("}");
@@ -80,20 +101,49 @@ namespace AddSubSheet
                         var rnd = new Random();
                         stream.WriteLine($"<table class=\"sumstable\">");
 
-                        var sum = new AddSubSum();
+                        var sum = new AddSubSum(rows * columns);
+                        var e = sum.GetEnumerable().GetEnumerator();
                         for (int i = 0; i < rows * columns; i++)
                         {
                             if (i % columns == 0)
                             {
                                 stream.WriteLine($"<tr>");
+                                stream.WriteLine($"<td class=\"col1\">{alphabet[i / columns]}</td>");
                             }
-                            stream.WriteLine($"<td>{sum.Next()}</td>");
+
+                            e.MoveNext();
+                            var s = e.Current;
+                            answers.Add(s.answer);
+
+                            stream.WriteLine($"<td>{s.first} {s.op} {s.second} = </td>");
                             if ((i + 1) % columns == 0)
                             {
                                 stream.WriteLine($"</tr>");
                             }
                         }
                         stream.WriteLine($"</table>");
+                        stream.WriteLine("<div class=\"answers\">");
+
+                        stream.WriteLine($"<table class=\"answerstable\">");
+                        for (int i = 0; i < answers.Count; i++)
+                        {
+                            if (i % columns == 0)
+                            {
+                                stream.WriteLine($"<tr>");
+                                stream.WriteLine($"<td class=\"col1\">{alphabet[i / columns]}</td>");
+                            }
+
+                            stream.WriteLine($"<td>{answers[i]}</td>");
+
+                            if ((i + 1) % columns == 0)
+                            {
+                                stream.WriteLine($"</tr>");
+                            }
+
+                        }
+                        stream.WriteLine("</div>");
+                        stream.WriteLine($"</table>");
+
                         stream.WriteLine($"</body>");
                         stream.WriteLine($"</html>");
                     }

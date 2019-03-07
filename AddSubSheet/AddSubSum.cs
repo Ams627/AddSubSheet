@@ -3,120 +3,122 @@ using System.Collections.Generic;
 
 namespace AddSubSheet
 {
-    class Counters
+    enum Operator
     {
-        public int Adds { get; set; } = 0;
-        public int Subs { get; set; } = 0;
-        public int SubsWithBorrow { get; set; } = 0;
-        public int Same { get; set; } = 0;
+        Add, Sub
     }
+
+
+    class SimpleSum
+    {
+        static Random rnd = new Random();
+
+        public SimpleSum(int type)
+        {
+            switch (type)
+            {
+                case 0:
+                    NewAdd();
+                    break;
+                case 1:
+                    NewSubNoBorrow();
+                    break;
+                case 2:
+                    NewSubWithBorrow();
+                    break;
+            }
+        }
+
+        public int First { get; set; }
+        public int Second { get; set; }
+        public int Answer { get; set; }
+        public Operator op { get; set; }
+
+
+        public void NewSubNoBorrow()
+        {
+            First = rnd.Next(10, 100);
+            Second = rnd.Next(First) / 10 * 10;
+            var units = rnd.Next(0, First % 10);
+            Second += units;
+            op = Operator.Sub;
+            Answer = First - Second;
+        }
+        public void NewSubWithBorrow()
+        {
+            First = rnd.Next(10, 100);
+            Second = rnd.Next(First) / 10 * 10;
+            var units = rnd.Next(First % 10 + 1, 10);
+            Second += units;
+            op = Operator.Sub;
+            Answer = First - Second;
+        }
+
+        public void NewAdd()
+        {
+            First = rnd.Next(100);
+            Second = rnd.Next(100);
+            op = Operator.Add;
+            Answer = First + Second;
+        }
+    }
+
     internal class AddSubSum
     {
         int _sumsPerPage;
-        static Counters counters = new Counters();
 
-        readonly Random rnd = new Random();
-        int _firstOperand;
-        int _secondOperand;
-        Operator _operator;
-
-        enum Operator
-        {
-            Add, Sub
-        }
         public AddSubSum(int sumsPerPage)
         {
             this._sumsPerPage = sumsPerPage;
         }
 
-        private IEnumerable<AddSubSum> Generator()
+        private IEnumerable<SimpleSum> Generator()
         {
-            var sumlist = new List<AddSubSum>();
+            var rnd = new Random();
+            var sumlist = new List<SimpleSum>();
             while (true)
             {
                 var l1 = _sumsPerPage / 2;
                 var l2 = _sumsPerPage * 3 / 4;
                 for (int i = 0; i < l1; i++)
                 {
-                    var sum = GenerateAddSum();
+                    sumlist.Add(new SimpleSum(0));
                 }
                 for (int i = l1; i < l2; i++)
                 {
-                    var sum = GenerateSubSumNoBorrow();
+                    sumlist.Add(new SimpleSum(1));
                 }
                 for (int i = l2; i < _sumsPerPage; i++)
                 {
-                    var sum = GenerateSubSum();
+                    sumlist.Add(new SimpleSum(2));
+                }
+
+                // randomly shuffle the list:
+                for (int i = sumlist.Count - 1; i > 0; i--)
+                {
+                    // random from zero to i:
+                    var j = rnd.Next(i + 1);
+
+                    // swap:
+                    var temp = sumlist[i];
+                    sumlist[i] = sumlist[j];
+                    sumlist[j] = temp;
+                }
+
+                foreach (var l in sumlist)
+                {
+                    yield return l;
                 }
             }
         }
 
-        private object GenerateSubSumNoBorrow()
+        public IEnumerable<(int first, int second, int answer, char op)> GetEnumerable()
         {
-            throw new NotImplementedException();
+            foreach (var sum in Generator())
+            {
+                char c = sum.op == Operator.Add ? '+' : '-';
+                yield return (sum.First, sum.Second, sum.Answer, c);
+            }
         }
-
-        private object GenerateAddSum()
-        {
-            throw new NotImplementedException();
-        }
-
-        private object GenerateSubSum()
-        {
-            throw new NotImplementedException();
-        }
-
-        public AddSubSum Next()
-        {
-            var diffCounters = counters.Adds - counters.Subs;
-            if (Math.Abs(diffCounters) < 3)
-            {
-                var generator = rnd.Next(2);
-                _operator = generator == 1 ? Operator.Add : Operator.Sub;
-            }
-            else if (diffCounters < 0)
-            {
-                _operator = Operator.Add;
-            }
-            else
-            {
-                _operator = Operator.Sub;
-            }
-
-            if (_operator == Operator.Add)
-            {
-                counters.Adds++;
-            }
-            else if (_operator == Operator.Sub)
-            {
-                counters.Subs++;
-            }
-
-            _firstOperand = rnd.Next(100);
-            _secondOperand = rnd.Next(100);
-            if (_operator == Operator.Sub && _firstOperand < _secondOperand)
-            {
-                var temp = _firstOperand;
-                _firstOperand = _secondOperand;
-                _secondOperand = temp;
-            }
-            return this;
-        }
-
-        public override string ToString()
-        {
-            char c = '@';
-            switch (_operator)
-            {
-                case Operator.Add:
-                    c = '+';
-                    break;
-                case Operator.Sub:
-                    c = '-';
-                    break;
-            }
-            return $"{_firstOperand} {c} {_secondOperand} = ";
-        }
-
     }
 }

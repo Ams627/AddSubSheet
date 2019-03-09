@@ -37,6 +37,7 @@ namespace AddSubSheet
                 using (var batchFileStream = new StreamWriter(batchConverterName))
                 {
                     batchFileStream.WriteLine("@echo off");
+                    batchFileStream.WriteLine("pskill -nobanner foxitreader >nul");
                     for (var sheet = 0; sheet < numberOfWorksheets; sheet++)
                     {
                         var filename = MakeFilename(sheet);
@@ -47,9 +48,9 @@ namespace AddSubSheet
                 const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
                 const int columns = 4;
                 const int rows = 18;
-                var answers = new List<int>();
                 for (int sheet = 0; sheet < numberOfWorksheets; sheet++)
                 {
+                    var answers = new List<int>();
                     var filename = MakeFilename(sheet);
                     using (var stream = new StreamWriter(filename))
                     {
@@ -86,12 +87,15 @@ namespace AddSubSheet
                         stream.WriteLine("border-collapse:collapse;");
                         stream.WriteLine("text-align:center;");
                         stream.WriteLine("}");
-                        stream.WriteLine(".answerstable, .answerstable td + td {");
+                        stream.WriteLine(".answerstable, .answerstable td {");
                         stream.WriteLine("padding-left:20px;");
                         stream.WriteLine("padding-right:20px;");
                         stream.WriteLine("color:black;");
                         stream.WriteLine("white-space: nowrap;");
                         stream.WriteLine("border:solid 1px #dddddd;");
+                        stream.WriteLine("}");
+                        stream.WriteLine(".answers {");
+                        stream.WriteLine("page-break-before: always;");
                         stream.WriteLine("}");
                         stream.WriteLine("</style>");
                         stream.WriteLine("<script>");
@@ -115,6 +119,11 @@ namespace AddSubSheet
                             var s = e.Current;
                             answers.Add(s.answer);
 
+                            if (s.answer < 0)
+                            {
+                                Console.WriteLine();
+                            }
+
                             stream.WriteLine($"<td>{s.first} {s.op} {s.second} = </td>");
                             if ((i + 1) % columns == 0)
                             {
@@ -123,6 +132,7 @@ namespace AddSubSheet
                         }
                         stream.WriteLine($"</table>");
                         stream.WriteLine("<div class=\"answers\">");
+                        stream.WriteLine("<h1>Answers</h1>");
 
                         stream.WriteLine($"<table class=\"answerstable\">");
                         for (int i = 0; i < answers.Count; i++)

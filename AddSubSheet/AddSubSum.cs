@@ -43,15 +43,23 @@ namespace AddSubSheet
             Second += units;
             op = Operator.Sub;
             Answer = First - Second;
+            if (Answer < 0)
+            {
+                Console.WriteLine();
+            }
         }
         public void NewSubWithBorrow()
         {
             First = rnd.Next(10, 100);
-            Second = rnd.Next(First) / 10 * 10;
+            Second = rnd.Next((First / 10 - 1) * 10);
             var units = rnd.Next(First % 10 + 1, 10);
             Second += units;
             op = Operator.Sub;
             Answer = First - Second;
+            if (Answer < 0)
+            {
+                Console.WriteLine();
+            }
         }
 
         public void NewAdd()

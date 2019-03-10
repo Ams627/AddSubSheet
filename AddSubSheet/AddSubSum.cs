@@ -5,7 +5,7 @@ namespace AddSubSheet
 {
     enum Operator
     {
-        Add, Sub
+        Add, Sub, Mul, Div
     }
 
 
@@ -26,8 +26,15 @@ namespace AddSubSheet
                 case 2:
                     NewSubWithBorrow();
                     break;
+                case 3:
+                    NewMult();
+                    break;
+                case 4:
+                    NewDiv();
+                    break;
             }
         }
+
 
         public int First { get; set; }
         public int Second { get; set; }
@@ -68,6 +75,17 @@ namespace AddSubSheet
             Second = rnd.Next(100);
             op = Operator.Add;
             Answer = First + Second;
+        }
+        private void NewDiv()
+        {
+            First = rnd.Next(50) * 2;
+            Second = 2;
+        }
+
+        private void NewMult()
+        {
+            First = rnd.Next(50);
+            Second = 2;
         }
     }
 
@@ -124,7 +142,27 @@ namespace AddSubSheet
         {
             foreach (var sum in Generator())
             {
-                char c = sum.op == Operator.Add ? '+' : '-';
+                char c; 
+                
+                switch (sum.op)
+                {
+                    case Operator.Add:
+                        c = '+';
+                        break;
+                    case Operator.Sub:
+                        c = '-';
+                        break;
+                    case Operator.Mul:
+                        c = '.';
+                        break;
+                    case Operator.Div:
+                        c = ':';
+                        break;
+                    default:
+                        c = '@';
+                        break;
+                }
+
                 yield return (sum.First, sum.Second, sum.Answer, c);
             }
         }

@@ -97,12 +97,18 @@ namespace AddSubSheet
                         stream.WriteLine(".answers {");
                         stream.WriteLine("page-break-before: always;");
                         stream.WriteLine("}");
+                        stream.WriteLine(".tickslabel {");
+                        stream.WriteLine("font-size: 12pt;");
+                        stream.WriteLine("}");
                         stream.WriteLine("</style>");
                         stream.WriteLine("<script>");
                         stream.WriteLine("</script>");
                         stream.WriteLine("</head>");
 
                         var rnd = new Random();
+
+                        var ticks = Guid.NewGuid();
+                        stream.WriteLine($"<p class=\"tickslabel\">{ticks}</p>");
                         stream.WriteLine($"<table class=\"sumstable\">");
 
                         var sum = new AddSubSum(rows * columns);
@@ -132,6 +138,7 @@ namespace AddSubSheet
                         }
                         stream.WriteLine($"</table>");
                         stream.WriteLine("<div class=\"answers\">");
+                        stream.WriteLine($"<p class=\"tickslabel\">{ticks}</p>");
                         stream.WriteLine("<h1>Answers</h1>");
 
                         stream.WriteLine($"<table class=\"answerstable\">");
